@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HaylouStore — Espace administrateur</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0A1B3D; --blue:#2F6BFF; --mist:#F5F7FB; --cloud:#EBEFF6; --line:#E1E6EF;
+  --text:#1B2333; --text-dim:#5C6578; --ok:#1FA97E; --warn:#E0A72B; --danger:#E14B4B;
+  --radius:16px; --shadow:0 12px 40px rgba(10,27,61,.10);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{font-family:'Inter',sans-serif; background:var(--mist); color:var(--text); -webkit-font-smoothing:antialiased;}
+.disp{font-family:'Space Grotesk',sans-serif;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+.wrap{max-width:1160px; margin:0 auto; padding:0 24px;}
+.btn{padding:12px 20px; border-radius:100px; font-weight:700; font-size:.85rem; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;}
+.btn-primary{background:var(--navy); color:#fff;}
+.btn-primary:hover{background:var(--blue);}
+.btn-outline{background:#fff; border:1.5px solid var(--line); color:var(--navy);}
+.btn-sm{padding:9px 14px; font-size:.78rem;}
+.btn-block{width:100%; justify-content:center;}
+.form-input{width:100%; border:1px solid var(--line); border-radius:12px; padding:12px 14px; font-size:.85rem; margin-bottom:12px; font-family:'Inter';}
+textarea.form-input{min-height:80px; resize:vertical;}
+.f-opt{display:flex; align-items:center; gap:8px; font-size:.85rem; margin-bottom:14px;}
+
+/* login */
+.login-shell{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;}
+.login-card{background:#fff; border:1px solid var(--line); border-radius:var(--radius); padding:36px; max-width:380px; width:100%; box-shadow:var(--shadow);}
+.login-icon{width:44px; height:44px; border-radius:12px; background:var(--navy); display:flex; align-items:center; justify-content:center; margin-bottom:18px;}
+.login-card h2{font-size:1.3rem; color:var(--navy); margin-bottom:6px;}
+.login-card p{font-size:.85rem; color:var(--text-dim); margin-bottom:22px;}
+
+/* topbar */
+.topbar{background:#fff; border-bottom:1px solid var(--line); padding:16px 0; position:sticky; top:0; z-index:10;}
+.topbar .wrap{display:flex; align-items:center; justify-content:space-between;}
+.topbar h1{font-size:1.05rem; color:var(--navy);}
+.topbar span{font-size:.75rem; color:var(--text-dim); display:block; margin-top:2px;}
+
+.shell{padding:30px 0 80px;}
+.banner{background:#fff7e8; border:1px solid #f2debb; border-radius:14px; padding:16px 20px; margin-bottom:24px; font-size:.85rem; color:#7a5a15; line-height:1.5;}
+.stats{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px;}
+.stat-card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px;}
+.stat-card span{display:block; font-family:'IBM Plex Mono'; font-size:.68rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px;}
+.stat-card b{font-family:'Space Grotesk'; font-size:1.5rem; color:var(--navy);}
+.toolbar{display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:18px;}
+.search-box{display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--line); border-radius:100px; padding:10px 16px; max-width:320px; flex:1;}
+.search-box input{border:none; outline:none; flex:1; font-size:.85rem;}
+.table-shell{background:#fff; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
+table{width:100%; border-collapse:collapse; min-width:640px;}
+thead tr{background:var(--mist);}
+th{text-align:left; padding:13px 18px; font-size:.68rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em;}
+td{padding:12px 18px; border-top:1px solid var(--line); font-size:.85rem;}
+.td-product{display:flex; align-items:center; gap:10px;}
+.td-product img{width:40px; height:40px; border-radius:9px; object-fit:cover; background:var(--cloud);}
+.td-product b{font-size:.84rem; color:var(--navy); display:block;}
+.td-product span{font-size:.72rem; color:var(--text-dim);}
+.btn-edit,.btn-del{border-radius:8px; padding:7px 12px; font-size:.74rem; font-weight:700; border:1px solid var(--line); background:#fff; color:var(--navy); margin-left:6px; cursor:pointer;}
+.btn-del{border-color:#f3c9c9; background:#fdf0f0; color:var(--danger);}
+.empty{padding:60px 20px; text-align:center; color:var(--text-dim); font-size:.88rem;}
+
+/* modal */
+.modal{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:20px;}
+.modal.open{display:flex;}
+.modal-backdrop{position:absolute; inset:0; background:rgba(6,9,17,.55); backdrop-filter:blur(4px);}
+.modal-panel{position:relative; background:#fff; border-radius:20px; max-width:560px; width:100%; max-height:88vh; overflow-y:auto; padding:28px;}
+.modal-close{position:absolute; top:16px; right:16px; width:34px; height:34px; border:none; background:var(--mist); border-radius:10px; cursor:pointer;}
+.form-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.subhead{font-size:.8rem; font-weight:700; color:var(--navy); margin:16px 0 10px;}
+.dyn-row{display:grid; grid-template-columns:1fr 1fr 38px; gap:8px; margin-bottom:8px;}
+.dyn-row.single{grid-template-columns:1fr 38px;}
+.dyn-row .form-input{margin-bottom:0;}
+.row-remove{border:1px solid var(--line); background:#fff; border-radius:10px; color:var(--danger); cursor:pointer;}
+.toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); z-index:200; background:var(--navy); color:#fff; padding:14px 22px; border-radius:100px; font-size:.85rem; font-weight:600; opacity:0; pointer-events:none; transition:.3s;}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+@media (max-width:760px){.stats{grid-template-columns:repeat(2,1fr);} .form-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<!-- Product form modal -->
+<div class="modal" id="formModal">
+  <div class="modal-backdrop" onclick="closeForm()"></div>
+  <div class="modal-panel" id="formPanel"></div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="modal" id="confirmModal">
+  <div class="modal-backdrop" onclick="closeConfirm()"></div>
+  <div class="modal-panel" style="max-width:400px; text-align:center;">
+    <p id="confirmText" style="font-size:.9rem; margin-bottom:22px; line-height:1.5;"></p>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline" style="flex:1" onclick="closeConfirm()">Annuler</button>
+      <button class="btn" style="flex:1; background:var(--danger); color:#fff" onclick="executeDelete()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = '';
+let PRODUCTS = [];
+let isAuth = false;
+let sessionPassword = null;
+let editId = null;
+let draft = null;
+let draftSpecs = [];
+let draftBox = [];
+let deleteTarget = null;
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._t);
+  window._t = setTimeout(()=>t.classList.remove('show'), 2500);
+}
+const fmt = n => n.toLocaleString('fr-FR').replace(/,/g,' ') + ' CFA';
+const byId = id => PRODUCTS.find(p=>p.id===id);
+function slugify(s){
+  return s.toString().toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/(^-+|-+$)/g,'') || 'produit';
+}
+
+/* ---- render root ---- */
+function render(){
+  document.getElementById('app').innerHTML = isAuth ? dashboardView() : loginView();
+  if(isAuth){ bindSearch(); renderTable(); }
+}
+
+function loginView(){
+  return `
+  <div class="login-shell">
+    <div class="login-card">
+      <div class="login-icon"><svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 118 0v3"/></svg></div>
+      <h2 class="disp">Espace administrateur</h2>
+      <p>Connectez-vous pour gérer le catalogue HaylouStore.</p>
+      <form onsubmit="login(event)">
+        <input class="form-input" id="pass" type="password" placeholder="Mot de passe" required autofocus>
+        <button class="btn btn-primary btn-block" type="submit">Se connecter</button>
+      </form>
+    </div>
+  </div>`;
+}
+
+async function login(e){
+  e.preventDefault();
+  const pass = document.getElementById('pass').value;
+  try{
+    const res = await fetch(`${API_BASE}/admin-auth`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password: pass})
+    });
+    const data = await res.json();
+    if(data.ok){
+      sessionPassword = pass;
+      isAuth = true;
+      await loadCatalog();
+      render();
+    } else {
+      toast('Mot de passe incorrect');
+    }
+  } catch(err){
+    toast("Impossible de contacter le serveur");
+  }
+}
+function logout(){ isAuth = false; sessionPassword = null; render(); }
+
+async function loadCatalog(){
+  try{
+    const res = await fetch(`${API_BASE}/products`, {cache:'no-store'});
+    PRODUCTS = await res.json();
+  } catch(err){
+    PRODUCTS = [];
+    toast("Erreur de chargement du catalogue");
+  }
+}
+async function saveCatalog(){
+  try{
+    const res = await fetch(`${API_BASE}/products`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json', 'x-admin-password': sessionPassword},
+      body: JSON.stringify(PRODUCTS)
+    });
+    if(!res.ok){
+      if(res.status===401){ toast('Session expirée, reconnectez-vous'); isAuth=false; render(); }
+      else toast("Erreur d'enregistrement");
+      return false;
+    }
+    return true;
+  } catch(err){
+    toast("Erreur réseau — vérifiez votre connexion");
+    return false;
+  }
+}
+
+function dashboardView(){
+  const totalValue = PRODUCTS.reduce((s,p)=>s+p.price*p.stock,0);
+  const lowStock = PRODUCTS.filter(p=>p.stock<=5).length;
+  const promoCount = PRODUCTS.filter(p=>p.oldPrice && p.oldPrice>p.price).length;
+  return `
+  <div class="topbar"><div class="wrap">
+    <div><h1 class="disp">Espace administrateur</h1><span>HaylouStore.bf — gestion du catalogue</span></div>
+    <button class="btn btn-outline btn-sm" onclick="logout()">Se déconnecter</button>
+  </div></div>
+  <div class="shell wrap">
+    <div class="stats">
+      <div class="stat-card"><span>Produits</span><b>${PRODUCTS.length}</b></div>
+      <div class="stat-card"><span>Valeur du stock</span><b>${fmt(totalValue)}</b></div>
+      <div class="stat-card"><span>Stock faible</span><b style="color:var(--warn)">${lowStock}</b></div>
+      <div class="stat-card"><span>En promotion</span><b style="color:var(--ok)">${promoCount}</b></div>
+    </div>
+    <div class="toolbar">
+      <div class="search-box"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="text" id="search" placeholder="Rechercher un produit..."></div>
+      <button class="btn btn-primary" onclick="openForm(null)">+ Ajouter un produit</button>
+    </div>
+    <div class="table-shell"><div id="tableWrap"></div></div>
+  </div>`;
+}
+function bindSearch(){
+  document.getElementById('search').addEventListener('input', renderTable);
+}
+function renderTable(){
+  const wrap = document.getElementById('tableWrap');
+  const q = (document.getElementById('search')?.value||'').toLowerCase();
+  const list = PRODUCTS.filter(p=>!q || p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+  if(list.length===0){ wrap.innerHTML = `<div class="empty">Aucun produit ne correspond.</div>`; return; }
+  wrap.innerHTML = `<div style="overflow-x:auto;"><table>
+    <thead><tr><th>Produit</th><th>Catégorie</th><th style="text-align:right">Prix</th><th style="text-align:center">Stock</th><th style="text-align:right">Actions</th></tr></thead>
+    <tbody>
+      ${list.map(p=>`
+        <tr>
+          <td><div class="td-product"><img src="${p.image}" alt=""><div><b>${p.name}</b><span>${p.brand}</span></div></div></td>
+          <td style="color:var(--text-dim)">${p.category}</td>
+          <td style="text-align:right" class="mono">${fmt(p.price)}</td>
+          <td style="text-align:center; font-weight:700; color:${p.stock<=5?'var(--warn)':'var(--text)'}">${p.stock}</td>
+          <td style="text-align:right; white-space:nowrap;">
+            <button class="btn-edit" onclick="openForm('${p.id}')">Modifier</button>
+            <button class="btn-del" onclick="confirmDelete('${p.id}')">Supprimer</button>
+          </td>
+        </tr>`).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+/* ---- product form ---- */
+function openForm(id){
+  editId = id;
+  if(id){
+    const p = byId(id);
+    draft = JSON.parse(JSON.stringify(p));
+    draftSpecs = Object.entries(draft.specs||{}).map(([k,v])=>({k,v}));
+    draftBox = draft.box && draft.box.length ? [...draft.box] : [''];
+  } else {
+    draft = {id:'', brand:'', name:'', category:'', price:'', oldPrice:'', image:'', badges:[], rating:4.5, reviewsCount:0, stock:10, description:'', specs:{}, box:[]};
+    draftSpecs = [{k:'',v:''}];
+    draftBox = [''];
+  }
+  renderForm();
+  document.getElementById('formModal').classList.add('open');
+}
+function closeForm(){ document.getElementById('formModal').classList.remove('open'); }
+
+function renderForm(){
+  const isEdit = !!editId;
+  const cats = [...new Set(PRODUCTS.map(p=>p.category))];
+  const brands = [...new Set(PRODUCTS.map(p=>p.brand))];
+  document.getElementById('formPanel').innerHTML = `
+    <button class="modal-close" onclick="closeForm()">✕</button>
+    <h3 class="disp" style="color:var(--navy); font-size:1.15rem; margin-bottom:18px;">${isEdit?'Modifier le produit':'Ajouter un produit'}</h3>
+    <div style="display:flex; gap:16px; align-items:center; margin-bottom:20px;">
+      <img id="imgPreview" src="${draft.image||''}" style="width:74px; height:74px; border-radius:12px; object-fit:cover; background:var(--cloud); border:1px solid var(--line);">
+      <div>
+        <label class="btn btn-outline btn-sm" style="cursor:pointer; display:inline-flex;">Choisir une image
+          <input type="file" accept="image/*" style="display:none" onchange="handleImage(this)">
+        </label>
+        <p style="font-size:.72rem; color:var(--text-dim); margin-top:6px;">Redimensionnée et optimisée automatiquement.</p>
+      </div>
+    </div>
+    <div class="form-row">
+      <input class="form-input" id="fName" placeholder="Nom du produit" value="${draft.name||''}">
+      <input class="form-input" id="fBrand" list="brandList" placeholder="Marque" value="${draft.brand||''}">
+    </div>
+    <datalist id="brandList">${brands.map(b=>`<option value="${b}">`).join('')}</datalist>
+    <div class="form-row">
+      <input class="form-input" id="fCategory" list="catList" placeholder="Catégorie" value="${draft.category||''}">
+      <input class="form-input" id="fStock" type="number" min="0" placeholder="Stock disponible" value="${draft.stock??''}">
+    </div>
+    <datalist id="catList">${cats.map(c=>`<option value="${c}">`).join('')}</datalist>
+    <div class="form-row">
+      <input class="form-input" id="fPrice" type="number" min="0" placeholder="Prix (CFA)" value="${draft.price||''}">
+      <input class="form-input" id="fOldPrice" type="number" min="0" placeholder="Ancien prix (optionnel)" value="${draft.oldPrice||''}">
+    </div>
+    <div class="form-row">
+      <input class="form-input" id="fRating" type="number" min="0" max="5" step="0.1" placeholder="Note / 5" value="${draft.rating||4.5}">
+      <input class="form-input" id="fReviews" type="number" min="0" placeholder="Nombre d'avis" value="${draft.reviewsCount||0}">
+    </div>
+    <label class="f-opt"><input type="checkbox" id="fNew" ${draft.badges?.includes('new')?'checked':''}><span>Marquer comme nouveauté</span></label>
+    <textarea class="form-input" id="fDesc" placeholder="Description">${draft.description||''}</textarea>
+    <h4 class="subhead">Caractéristiques techniques</h4>
+    <div id="specRows"></div>
+    <button type="button" class="btn btn-outline btn-sm" onclick="addSpec()" style="margin-bottom:18px;">+ Ajouter une caractéristique</button>
+    <h4 class="subhead">Contenu de la boîte</h4>
+    <div id="boxRows"></div>
+    <button type="button" class="btn btn-outline btn-sm" onclick="addBox()" style="margin-bottom:20px;">+ Ajouter un article</button>
+    <button class="btn btn-primary btn-block" onclick="saveForm()">${isEdit?'Enregistrer les modifications':'Ajouter le produit'}</button>
+  `;
+  renderSpecs();
+  renderBoxes();
+}
+function renderSpecs(){
+  document.getElementById('specRows').innerHTML = draftSpecs.map((s,i)=>`
+    <div class="dyn-row">
+      <input class="form-input spec-k" placeholder="Nom (ex : Bluetooth)" value="${s.k||''}">
+      <input class="form-input spec-v" placeholder="Valeur (ex : 5.3)" value="${s.v||''}">
+      <button type="button" class="row-remove" onclick="removeSpec(${i})">✕</button>
+    </div>`).join('');
+}
+function renderBoxes(){
+  document.getElementById('boxRows').innerHTML = draftBox.map((b,i)=>`
+    <div class="dyn-row single">
+      <input class="form-input" placeholder="Ex : Câble USB-C" value="${b||''}">
+      <button type="button" class="row-remove" onclick="removeBox(${i})">✕</button>
+    </div>`).join('');
+}
+function syncSpecs(){
+  draftSpecs = Array.from(document.querySelectorAll('#specRows .dyn-row')).map(r=>({
+    k: r.querySelector('.spec-k').value, v: r.querySelector('.spec-v').value
+  }));
+}
+function syncBoxes(){
+  draftBox = Array.from(document.querySelectorAll('#boxRows .dyn-row.single input')).map(i=>i.value);
+}
+function addSpec(){ syncSpecs(); draftSpecs.push({k:'',v:''}); renderSpecs(); }
+function removeSpec(i){ syncSpecs(); draftSpecs.splice(i,1); renderSpecs(); }
+function addBox(){ syncBoxes(); draftBox.push(''); renderBoxes(); }
+function removeBox(i){ syncBoxes(); draftBox.splice(i,1); renderBoxes(); }
+
+function handleImage(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const maxDim = 1000;
+      let w = img.width, h = img.height;
+      if(w > maxDim || h > maxDim){
+        if(w >= h){ h = Math.round(h*maxDim/w); w = maxDim; } else { w = Math.round(w*maxDim/h); h = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      draft.image = canvas.toDataURL('image/jpeg', 0.87);
+      document.getElementById('imgPreview').src = draft.image;
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveForm(){
+  syncSpecs(); syncBoxes();
+  const name = document.getElementById('fName').value.trim();
+  const brand = document.getElementById('fBrand').value.trim();
+  const category = document.getElementById('fCategory').value.trim();
+  const price = +document.getElementById('fPrice').value;
+  const oldPriceRaw = document.getElementById('fOldPrice').value;
+  const oldPrice = oldPriceRaw ? +oldPriceRaw : null;
+  const stock = +document.getElementById('fStock').value || 0;
+  const rating = Math.min(5, Math.max(0, +document.getElementById('fRating').value || 4.5));
+  const reviewsCount = +document.getElementById('fReviews').value || 0;
+  const description = document.getElementById('fDesc').value.trim();
+  const isNew = document.getElementById('fNew').checked;
+
+  if(!name || !brand || !category || !price || !draft.image){
+    toast('Merci de renseigner nom, marque, catégorie, prix et une image');
+    return;
+  }
+  const specs = {};
+  draftSpecs.forEach(s=>{ if(s.k && s.k.trim()) specs[s.k.trim()] = (s.v||'').trim(); });
+  const box = draftBox.map(b=>b.trim()).filter(Boolean);
+  const badges = isNew ? ['new'] : [];
+
+  let id = editId;
+  if(!id){
+    const base = slugify(name);
+    id = base; let n = 2;
+    while(byId(id)){ id = `${base}-${n}`; n++; }
+  }
+  const product = {id, brand, name, category, price, oldPrice, image: draft.image, badges, rating, reviewsCount, stock, description, specs, box};
+
+  if(editId){
+    const idx = PRODUCTS.findIndex(p=>p.id===editId);
+    PRODUCTS[idx] = product;
+  } else {
+    PRODUCTS.push(product);
+  }
+  const btn = document.querySelector('#formPanel .btn-primary');
+  btn.disabled = true; btn.textContent = 'Enregistrement...';
+  const ok = await saveCatalog();
+  if(ok){
+    toast(editId ? 'Produit mis à jour' : 'Produit ajouté au catalogue');
+    closeForm();
+    renderTable();
+    document.querySelector('.stats').outerHTML = document.querySelector('.stats').outerHTML; // noop safe
+    render();
+  } else {
+    btn.disabled = false; btn.textContent = editId?'Enregistrer les modifications':'Ajouter le produit';
+  }
+}
+
+function confirmDelete(id){
+  const p = byId(id);
+  deleteTarget = id;
+  document.getElementById('confirmText').textContent = `Supprimer « ${p.name} » du catalogue ? Cette action est irréversible.`;
+  document.getElementById('confirmModal').classList.add('open');
+}
+function closeConfirm(){ document.getElementById('confirmModal').classList.remove('open'); deleteTarget = null; }
+async function executeDelete(){
+  if(!deleteTarget) return;
+  PRODUCTS = PRODUCTS.filter(p=>p.id!==deleteTarget);
+  const ok = await saveCatalog();
+  closeConfirm();
+  if(ok){ toast('Produit supprimé'); render(); }
+}
+
+render();
+</script>
+</body>
+</html>
