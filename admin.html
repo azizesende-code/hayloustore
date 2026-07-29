@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HaylouStore — Espace administrateur</title>
+<title>HaydouStore — Espace administrateur</title>
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -139,7 +139,7 @@ function loginView(){
     <div class="login-card">
       <div class="login-icon"><svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 118 0v3"/></svg></div>
       <h2 class="disp">Espace administrateur</h2>
-      <p>Connectez-vous pour gérer le catalogue HaylouStore.</p>
+      <p>Connectez-vous pour gérer le catalogue HaydouStore.</p>
       <form onsubmit="login(event)">
         <input class="form-input" id="pass" type="password" placeholder="Mot de passe" required autofocus>
         <button class="btn btn-primary btn-block" type="submit">Se connecter</button>
@@ -204,7 +204,7 @@ function dashboardView(){
   const promoCount = PRODUCTS.filter(p=>p.oldPrice && p.oldPrice>p.price).length;
   return `
   <div class="topbar"><div class="wrap">
-    <div><h1 class="disp">Espace administrateur</h1><span>HaylouStore.bf — gestion du catalogue</span></div>
+    <div><h1 class="disp">Espace administrateur</h1><span>HaydouStore.bf — gestion du catalogue</span></div>
     <button class="btn btn-outline btn-sm" onclick="logout()">Se déconnecter</button>
   </div></div>
   <div class="shell wrap">
